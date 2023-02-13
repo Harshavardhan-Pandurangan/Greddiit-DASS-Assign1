@@ -13,6 +13,8 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useEffect } from "react";
 
 function Copyright(props) {
     return (
@@ -32,11 +34,7 @@ function Copyright(props) {
     );
 }
 
-const theme = createTheme({
-    palette: {
-        mode: "dark",
-    },
-});
+const theme = createTheme();
 
 export default function SignIn() {
     let navigate = useNavigate();
@@ -46,13 +44,25 @@ export default function SignIn() {
         const data = new FormData(event.currentTarget);
         let mail = data.get("email");
         let pass = data.get("password");
-        if (mail === "admin" && pass === "admin") {
-            localStorage.setItem("sign_status", "true");
-            navigate("/", { replace: true });
-        } else {
-            alert("Invalid Credentials");
-        }
+
+        axios
+            .post("http://localhost:3001/users/login", {
+                email: mail,
+                password: pass,
+            })
+            .then((res) => {
+                localStorage.setItem("token", res.data.token);
+                localStorage.setItem("id", res.data._id);
+                navigate("/home", { replace: true });
+            })
+            .catch((err) => {
+                alert("Invalid Credentials");
+            });
     };
+
+    useEffect(() => {
+        localStorage.clear();
+    }, []);
 
     return (
         <ThemeProvider theme={theme}>
@@ -108,12 +118,6 @@ export default function SignIn() {
                             type="password"
                             id="password"
                         />
-                        <FormControlLabel
-                            control={
-                                <Checkbox value="remember" color="primary" />
-                            }
-                            label="Remember me"
-                        />
                         <Button
                             type="submit"
                             fullWidth
@@ -123,11 +127,6 @@ export default function SignIn() {
                             Sign In
                         </Button>
                         <Grid container>
-                            <Grid item xs>
-                                <Link href="#" variant="body2">
-                                    Forgot password?
-                                </Link>
-                            </Grid>
                             <Grid item>
                                 <Link href="/auth/signup" variant="body2">
                                     {"Don't have an account? Sign Up"}

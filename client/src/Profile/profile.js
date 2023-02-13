@@ -14,6 +14,9 @@ import EditIcon from "@mui/icons-material/Edit";
 import HomeIcon from "@mui/icons-material/Home";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useState, useEffect } from "react";
+import Tooltip from "@mui/material/Tooltip";
 
 function Copyright(props) {
     return (
@@ -32,9 +35,6 @@ function Copyright(props) {
 }
 
 const theme = createTheme({
-    palette: {
-        mode: "dark",
-    },
     typography: {
         fontSize: 12,
     },
@@ -56,22 +56,52 @@ const style = {
 export default function Profile() {
     let navigate = useNavigate();
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get("email"),
-            password: data.get("password"),
-        });
+    const [firstname, setFirstname] = useState("");
+    const [lastname, setLastname] = useState("");
+    const [email, setEmail] = useState("");
+    const [username, setUsername] = useState("");
+    const [contact, setContact] = useState("");
+    const [dob, setDob] = useState("");
+
+    const editProfile = () => {
+        navigate("/edit-profile", { replace: true });
     };
 
-    const username = "kinghahaha";
-    const firstname = "Harshavardhan";
-    const lastname = "Pandurangan";
-    const email = "rockingharsha71@gmail.com";
-    const contact = "+91-909-4717-606";
-    const dob = "02/14/2003";
-    const age = "19";
+    const logout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("id");
+        navigate("/", { replace: true });
+    };
+
+    let request_path =
+        "http://localhost:3001/users/get/" + localStorage.getItem("id");
+    let json_pass_data = {
+        headers: {
+            Authorization: `token ${localStorage.token}`,
+        },
+    };
+
+    useEffect(() => {
+        axios
+            .get(request_path, json_pass_data)
+            .then((res) => {
+                setFirstname(res.data.firstname);
+                setLastname(res.data.lastname);
+                setEmail(res.data.email);
+                setUsername(res.data.username);
+                setContact(res.data.contactnumber);
+                let formattedDate = new Date(res.data.dob).toLocaleDateString(
+                    "en-US",
+                    {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                    }
+                );
+                setDob(formattedDate);
+            })
+            .catch((err) => {});
+    }, []);
 
     const [openFollowers, setOpenFollowers] = React.useState(false);
     const handleFollowersOpen = () => setOpenFollowers(true);
@@ -88,34 +118,52 @@ export default function Profile() {
                 <Grid
                     style={{ display: "flex", justifyContent: "space-between" }}
                 >
-                    <Button
-                        variant="contained"
-                        style={{
-                            marginTop: "1rem",
-                            marginBottom: "1rem",
-                            borderRadius: "2rem",
-                            color: "white",
-                            backgroundColor: "rgb(243, 114, 32)",
-                        }}
-                    >
-                        <HomeIcon />
-                    </Button>
-                    <Button
-                        onClick={() => {
-                            localStorage.setItem("sign_status", "false");
-                            navigate("/", { replace: true });
-                        }}
-                        variant="contained"
-                        style={{
-                            marginTop: "1rem",
-                            marginBottom: "1rem",
-                            borderRadius: "2rem",
-                            color: "white",
-                            backgroundColor: "rgb(243, 114, 32)",
-                        }}
-                    >
-                        <LogoutIcon />
-                    </Button>
+                    <Tooltip title="Home">
+                        <Button
+                            variant="contained"
+                            style={{
+                                marginTop: "1rem",
+                                marginBottom: "1rem",
+                                borderRadius: "2rem",
+                                color: "white",
+                                backgroundColor: "rgb(243, 114, 32)",
+                            }}
+                            onClick={() => navigate("/home", { replace: true })}
+                        >
+                            <HomeIcon />
+                        </Button>
+                    </Tooltip>
+                    <Grid>
+                        <Tooltip title="Edit Profile">
+                            <Fab
+                                size="small"
+                                style={{
+                                    color: "white",
+                                    backgroundColor: "rgb(243, 114, 32)",
+                                    margin: "0.5rem",
+                                }}
+                                aria-label="edit"
+                                onClick={editProfile}
+                            >
+                                <EditIcon />
+                            </Fab>
+                        </Tooltip>
+                        <Tooltip title="Logout">
+                            <Button
+                                onClick={logout}
+                                variant="contained"
+                                style={{
+                                    marginTop: "1rem",
+                                    marginBottom: "1rem",
+                                    borderRadius: "2rem",
+                                    color: "white",
+                                    backgroundColor: "rgb(243, 114, 32)",
+                                }}
+                            >
+                                <LogoutIcon />
+                            </Button>
+                        </Tooltip>
+                    </Grid>
                 </Grid>
                 <Box
                     sx={{
@@ -135,30 +183,18 @@ export default function Profile() {
                     <br />
                     <br />
                     <Grid container spacing={2}>
-                        <Grid item xs={11}>
+                        <Grid item xs={12}>
                             <Typography
                                 component="h1"
                                 variant="h5"
                                 style={{
-                                    color: "rgb(150, 150, 150)",
+                                    opacity: "0.5",
                                     display: "flex",
                                     justifyContent: "center",
                                 }}
                             >
                                 User Profile
                             </Typography>
-                        </Grid>
-                        <Grid item xs={1}>
-                            <Fab
-                                size="small"
-                                style={{
-                                    color: "white",
-                                    backgroundColor: "rgb(243, 114, 32)",
-                                }}
-                                aria-label="edit"
-                            >
-                                <EditIcon />
-                            </Fab>
                         </Grid>
                     </Grid>
                     <br />
@@ -177,7 +213,6 @@ export default function Profile() {
                                 component="h2"
                                 variant="h6"
                                 style={{
-                                    color: "rgb(255, 255, 255)",
                                     display: "flex",
                                     justifyContent: "center",
                                 }}
@@ -190,7 +225,6 @@ export default function Profile() {
                                 component="h2"
                                 variant="h6"
                                 style={{
-                                    color: "rgb(255, 255, 255)",
                                     display: "flex",
                                     justifyContent: "center",
                                 }}
@@ -279,7 +313,7 @@ export default function Profile() {
                                 component="h3"
                                 variant="h6"
                                 style={{
-                                    color: "rgb(180, 180, 180)",
+                                    opacity: 0.5,
                                     display: "flex",
                                     justifyContent: "center",
                                 }}
@@ -287,20 +321,28 @@ export default function Profile() {
                                 {email}
                             </Typography>
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid item xs={12}>
                             <Typography
                                 component="h3"
                                 variant="h6"
-                                style={{ color: "rgb(180, 180, 180)" }}
+                                style={{
+                                    opacity: 0.5,
+                                    display: "flex",
+                                    justifyContent: "center",
+                                }}
                             >
                                 {dob}
                             </Typography>
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid item xs={12}>
                             <Typography
                                 component="h3"
                                 variant="h6"
-                                style={{ color: "rgb(180, 180, 180)" }}
+                                style={{
+                                    opacity: 0.5,
+                                    display: "flex",
+                                    justifyContent: "center",
+                                }}
                             >
                                 {contact}
                             </Typography>
