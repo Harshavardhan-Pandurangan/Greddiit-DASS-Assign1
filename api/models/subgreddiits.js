@@ -13,34 +13,35 @@ const subgredditSchema = new Schema({
     },
     tags: {
         type: Array,
+        default: [],
         required: true,
     },
     banned: {
         type: Array,
-        required: true,
-    },
-    createdby: {
-        type: String,
+        default: [],
         required: true,
     },
     createdon: {
         type: Date,
         required: true,
     },
-    moderators: {
-        type: Array,
+    moderator: {
+        type: String,
         required: true,
     },
     normierequests: {
         type: Array,
+        default: [],
         required: true,
     },
     bannednormies: {
         type: Array,
+        default: [],
         required: true,
     },
     normies: {
         type: Array,
+        default: [],
         required: true,
     },
 });

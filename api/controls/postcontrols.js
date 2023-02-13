@@ -1,0 +1,223 @@
+const Post = require("../models/posts");
+const asyncHandler = require("express-async-handler");
+const jwt = require("jsonwebtoken");
+
+const createPost = asyncHandler(async (req, res) => {
+    let token = req.headers["authorization"];
+    token = token.split(" ")[1];
+
+    let authData;
+    if (token) {
+        try {
+            authData = await jwt.verify(token, process.env.JWT_SECRET);
+        } catch (err) {
+            res.status(403).send({ error: "Invalid token" });
+            return;
+        }
+    }
+
+    if (authData) {
+        if (req.params.id != authData._id) {
+            res.status(403).send({
+                error: "You cannot make posts for other users",
+            });
+            return;
+        }
+    }
+
+    if (req.body) {
+        const post = new Post({
+            title: req.body.title,
+            text: req.body.text,
+            postedby: req.params.id,
+            subgreddiit: req.body.subgreddiit,
+        });
+        const createdPost = await post.save();
+        res.send(createdPost);
+    } else {
+        res.status(400).send({ error: "Bad request" });
+    }
+});
+
+const getPosts = asyncHandler(async (req, res) => {
+    let token = req.headers["authorization"];
+    token = token.split(" ")[1];
+
+    let authData;
+    if (token) {
+        try {
+            authData = await jwt.verify(token, process.env.JWT_SECRET);
+        } catch (err) {
+            res.status(403).send({ error: "Invalid token" });
+            return;
+        }
+    }
+
+    if (authData) {
+        if (req.params.id != authData._id) {
+            res.status(403).send({
+                error: "You cannot get posts for other users",
+            });
+            return;
+        }
+    }
+
+    if (req.body.id) {
+        const posts = await Post.findById(req.body.id);
+        res.send(posts);
+    } else {
+        const posts = await Post.find({ subgreddiit: req.body.subgreddiit });
+        res.send(posts);
+    }
+    res.status(400).send({ error: "Bad request" });
+});
+
+const getAllPosts = asyncHandler(async (req, res) => {
+    const posts = await Post.find({});
+    res.send(posts);
+});
+
+const deleteAllPosts = asyncHandler(async (req, res) => {
+    const posts = await Post.deleteMany({});
+    res.send(posts);
+});
+
+const deletePost = asyncHandler(async (req, res) => {
+    let token = req.headers["authorization"];
+    token = token.split(" ")[1];
+
+    let authData;
+    if (token) {
+        try {
+            authData = await jwt.verify(token, process.env.JWT_SECRET);
+        } catch (err) {
+            res.status(403).send({ error: "Invalid token" });
+            return;
+        }
+    }
+
+    if (authData) {
+        if (req.params.id != authData._id) {
+            res.status(403).send({
+                error: "You cannot delete posts for other users",
+            });
+            return;
+        }
+    }
+
+    if (req.body) {
+        const post = await Post.findById(req.body.id);
+        if (post) {
+            const deletedPost = await post.remove();
+            res.send(deletedPost);
+        } else {
+            res.status(404).send({ error: "Post not found" });
+        }
+    } else {
+        res.status(400).send({ error: "Bad request" });
+    }
+});
+
+const updatePost = asyncHandler(async (req, res) => {
+    let token = req.headers["authorization"];
+    token = token.split(" ")[1];
+
+    let authData;
+    if (token) {
+        try {
+            authData = await jwt.verify(token, process.env.JWT_SECRET);
+        } catch (err) {
+            res.status(403).send({ error: "Invalid token" });
+            return;
+        }
+    }
+
+    if (authData) {
+        if (req.params.id != authData._id) {
+            res.status(403).send({
+                error: "You cannot update posts for other users",
+            });
+            return;
+        }
+    }
+
+    if (req.body) {
+        const post = await Post.findById(req.body.id);
+        if (post) {
+            if (req.body.type == "upvote") {
+                if (!post.upvotes.includes(req.params.id)) {
+                    if (post.downvotes.includes(req.params.id)) {
+                        post.downvotes = post.downvotes.filter(
+                            (item) => item != req.params.id
+                        );
+                    }
+                    post.upvotes.push(req.params.id);
+                    const updatedPost = await post.save();
+                    res.send(updatedPost);
+                } else {
+                    res.status(400).send({ error: "Bad request" });
+                }
+            } else if (req.body.type == "downvote") {
+                if (!post.downvotes.includes(req.params.id)) {
+                    if (post.upvotes.includes(req.params.id)) {
+                        post.upvotes = post.upvotes.filter(
+                            (item) => item != req.params.id
+                        );
+                    }
+                    post.downvotes.push(req.params.id);
+                    const updatedPost = await post.save();
+                    res.send(updatedPost);
+                } else {
+                    res.status(400).send({ error: "Bad request" });
+                }
+            } else if (req.body.type == "unvote") {
+                if (post.upvotes.includes(req.params.id)) {
+                    post.upvotes = post.upvotes.filter(
+                        (item) => item != req.params.id
+                    );
+                    const updatedPost = await post.save();
+                    res.send(updatedPost);
+                } else if (post.downvotes.includes(req.params.id)) {
+                    post.downvotes = post.downvotes.filter(
+                        (item) => item != req.params.id
+                    );
+                    const updatedPost = await post.save();
+                    res.send(updatedPost);
+                } else {
+                    res.status(400).send({ error: "Bad request" });
+                }
+            } else if (req.body.type == "comment") {
+                if (req.body.comment) {
+                    post.comments.push(req.body.comment);
+                    const updatedPost = await post.save();
+                    res.send(updatedPost);
+                } else {
+                    res.status(400).send({ error: "Bad request" });
+                }
+            } else if (req.body.type == "deleteComment") {
+                if (req.body.commentid) {
+                    post.comments = post.comments.filter(
+                        (item) => item._id != req.body.commentid
+                    );
+                    const updatedPost = await post.save();
+                    res.send(updatedPost);
+                }
+            } else {
+                res.status(400).send({ error: "Bad request" });
+            }
+        } else {
+            res.status(404).send({ error: "Post not found" });
+        }
+    } else {
+        res.status(400).send({ error: "Bad request" });
+    }
+});
+
+module.exports = {
+    createPost,
+    getAllPosts,
+    deleteAllPosts,
+    updatePost,
+    getPosts,
+    deletePost,
+};

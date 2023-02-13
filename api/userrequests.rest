@@ -61,3 +61,25 @@ Content-Type: application/json
 DELETE http://localhost:3001/users/deleteall
 
 ###
+
+PUT http://localhost:3001/users/save/63e9ab782659354279519644
+Authorization: token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2M2U5YWI3ODI2NTkzNTQyNzk1MTk2NDQiLCJ1c2VybmFtZSI6ImhhcnNoYSIsImVtYWlsIjoicm9ja2luZ2hhcnNoYTcxQGdtYWlsLmNvbSIsImlhdCI6MTY3NjMwMzU5MSwiZXhwIjoxNjc4ODk1NTkxfQ.gqoVPc9D1L5RbeTXVcmGnQXCkRKNeQzNj4ZeKM342Og
+Content-Type: application/json
+
+{
+	"type": "save",
+	"id": "63e9ab782659354279519644"
+}
+
+###
+
+PUT http://localhost:3001/users/save/63e9ab782659354279519644
+Authorization: token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2M2U5YWI3ODI2NTkzNTQyNzk1MTk2NDQiLCJ1c2VybmFtZSI6ImhhcnNoYSIsImVtYWlsIjoicm9ja2luZ2hhcnNoYTcxQGdtYWlsLmNvbSIsImlhdCI6MTY3NjMwMzU5MSwiZXhwIjoxNjc4ODk1NTkxfQ.gqoVPc9D1L5RbeTXVcmGnQXCkRKNeQzNj4ZeKM342Og
+Content-Type: application/json
+
+{
+	"type": "unsave",
+	"id": "63e9ab782659354279519644"
+}
+
+###

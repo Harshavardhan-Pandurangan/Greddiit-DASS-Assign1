@@ -18,8 +18,12 @@ mongoose
 
 const userRoutes = require("./routes/userroutes");
 const subgredditRoutes = require("./routes/subgreddiitroutes");
+const postRoutes = require("./routes/postroutes");
+const reportRoutes = require("./routes/reportroutes");
 
 app.use("/users", userRoutes);
 app.use("/subgreddiits", subgredditRoutes);
+app.use("/posts", postRoutes);
+app.use("/reports", reportRoutes);
 
 app.listen(3001, () => console.log("Server is running on port 3001"));

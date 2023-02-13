@@ -1,9 +1,9 @@
 const User = require("../models/users");
 const bcrypt = require("bcryptjs");
-const asynHandler = require("express-async-handler");
+const asyncHandler = require("express-async-handler");
 const jwt = require("jsonwebtoken");
 
-const verifyUser = asynHandler(async (req, res) => {
+const verifyUser = asyncHandler(async (req, res) => {
     let token = req.headers["authorization"];
     token = token.split(" ")[1];
 
@@ -22,7 +22,7 @@ const verifyUser = asynHandler(async (req, res) => {
     }
 });
 
-const createUser = asynHandler(async (req, res) => {
+const createUser = asyncHandler(async (req, res) => {
     if (req.body) {
         const userExists = await User.findOne({ email: req.body.email });
         if (userExists) {
@@ -70,7 +70,7 @@ const createUser = asynHandler(async (req, res) => {
     }
 });
 
-const loginUser = asynHandler(async (req, res) => {
+const loginUser = asyncHandler(async (req, res) => {
     if (req.body) {
         const user = await User.findOne({ email: req.body.email });
         if (user) {
@@ -106,7 +106,7 @@ const loginUser = asynHandler(async (req, res) => {
     }
 });
 
-const updateUser = asynHandler(async (req, res) => {
+const updateUser = asyncHandler(async (req, res) => {
     console.log(req.body);
     let token = req.headers["authorization"];
     token = token.split(" ")[1];
@@ -183,7 +183,7 @@ const updateUser = asynHandler(async (req, res) => {
     }
 });
 
-const deleteUser = asynHandler(async (req, res) => {
+const deleteUser = asyncHandler(async (req, res) => {
     let token = req.headers["authorization"];
     token = token.split(" ")[1];
 
@@ -217,12 +217,12 @@ const deleteUser = asynHandler(async (req, res) => {
     }
 });
 
-const getUsers = asynHandler(async (req, res) => {
+const getUsers = asyncHandler(async (req, res) => {
     const users = await User.find({});
     res.status(200).send(users);
 });
 
-const getUser = asynHandler(async (req, res) => {
+const getUser = asyncHandler(async (req, res) => {
     let token = req.headers["authorization"];
     token = token.split(" ")[1];
 
@@ -257,9 +257,46 @@ const getUser = asynHandler(async (req, res) => {
     }
 });
 
-const deleteAllUsers = asynHandler(async (req, res) => {
+const deleteAllUsers = asyncHandler(async (req, res) => {
     const users = await User.deleteMany({});
     res.status(200).send(users);
+});
+
+const savePostUser = asyncHandler(async (req, res) => {
+    let token = req.headers["authorization"];
+    token = token.split(" ")[1];
+
+    let authData;
+    try {
+        authData = await jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+        res.status(403).send({ error: "Invalid token" });
+        return;
+    }
+
+    if (req.params.id != authData._id) {
+        res.status(403).send({ error: "You cannot update other users" });
+        return;
+    }
+
+    const user = await User.findById(req.params.id);
+    if (user) {
+        if (req.body.type == "save") {
+            if (!user.saved.includes(req.body.id)) {
+                user.saved.push(req.body.id);
+            }
+        } else if (req.body.type == "unsave") {
+            if (user.saved.includes(req.body.id)) {
+                user.saved = user.saved.filter((id) => id != req.body.id);
+            }
+        }
+        await user.save();
+        res.status(200).send(user);
+        return;
+    } else {
+        res.status(404).send({ error: "User not found" });
+        return;
+    }
 });
 
 module.exports = {
@@ -271,4 +308,5 @@ module.exports = {
     verifyUser,
     getUser,
     deleteAllUsers,
+    savePostUser,
 };
