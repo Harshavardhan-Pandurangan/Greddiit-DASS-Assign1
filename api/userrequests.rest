@@ -1,0 +1,63 @@
+POST http://localhost:3001/users/create
+Content-Type: application/json
+
+{
+	"firstname": "John",
+	"lastname": "Doe",
+	"username": "harsha",
+	"password": "dummy50",
+	"email": "john10",
+	"dob": "1999-01-02",
+	"contactnumber": 9090909090
+}
+
+###
+
+GET http://localhost:3001/users/getusers
+
+###
+
+DELETE  http://localhost:3001/users/delete/63e6c1cb3763673d28ad43c7
+Authorization: token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2M2U2YzFjYjM3NjM2NzNkMjhhZDQzYzciLCJ1c2VybmFtZSI6ImpvaG5kb2UiLCJlbWFpbCI6ImpvaG40IiwiaWF0IjoxNjc2MTMwNzAxLCJleHAiOjE2Nzg3MjI3MDF9.i8rlKP32TNn6WjxOfe-SDJgFsUhOWZFFo8RMiiIGkUM
+
+###
+
+GET http://localhost:3001/users/verify
+Authorization: token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2M2U2YmYwY2Q1MGNmOGUwMjFmNzVlNWMiLCJ1c2VybmFtZSI6ImpvaG5kb2UiLCJlbWFpbCI6ImpvaG4iLCJpYXQiOjE2NzYxMzA1MDIsImV4cCI6MTY3ODcyMjUwMn0.D9Nc3pH4fOTRBs3s3sQ3cWhA34PH6qOZuPapN4HOMKU
+
+###
+
+POST http://localhost:3001/users/login
+Content-Type: application/json
+
+{
+	"email": "rockingharsha71@gmail.com",
+	"password": "Harsha@1234"
+}
+
+###
+
+GET http://localhost:3001/users/get/63e7dcf1c43fa7ca54784368
+Authorization: token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2M2U3ZGNmMWM0M2ZhN2NhNTQ3ODQzNjgiLCJ1c2VybmFtZSI6ImhhcnNoYSIsImVtYWlsIjoicm9ja2luZ2hhcnNoYTcxQGdtYWlsLmNvbSIsImlhdCI6MTY3NjIxMTMxOCwiZXhwIjoxNjc4ODAzMzE4fQ.bRWfRcXmS0whWeuKFiw-q9vNqj978mp_9vIanBqeYos
+
+###
+
+PUT http://localhost:3001/users/update/63e9ab782659354279519644
+Authorization: token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2M2U5YWI3ODI2NTkzNTQyNzk1MTk2NDQiLCJ1c2VybmFtZSI6ImhhcnNoYSIsImVtYWlsIjoicm9ja2luZ2hhcnNoYTcxQGdtYWlsLmNvbSIsImlhdCI6MTY3NjI2MDU1MCwiZXhwIjoxNjc4ODUyNTUwfQ.ele418Wl04TyhUCvISg_VxbIINTCmKj3P_Q2PlwP8VU
+Content-Type: application/json
+
+{
+	"firstname": "Harshavardhan",
+    "lastname": "Pandurangan",
+    "username": "harsha",
+    "password": "Harsha@1234",
+    "email": "rockingharsha71@gmail.com",
+    "dob": "2003-02-14T00:00:00.000Z",
+    "contactnumber": "9094717606"
+}
+
+###
+
+DELETE http://localhost:3001/users/deleteall
+
+###

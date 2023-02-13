@@ -7,15 +7,19 @@ const {
     loginUser,
     deleteUser,
     getUsers,
-    verifyToken,
+    verifyUser,
+    getUser,
+    deleteAllUsers,
 } = require("../controls/usercontrols");
 
+router.get("/verify", verifyUser);
 router.post("/create", createUser);
 router.put("/update/:id", updateUser);
 router.post("/login", loginUser);
+router.get("/get/:id", getUser);
 router.delete("/delete/:id", deleteUser);
 // to be commented out when deployed
 router.get("/getusers", getUsers);
-router.get("/verifytoken", verifyToken);
+router.delete("/deleteall", deleteAllUsers);
 
 module.exports = router;

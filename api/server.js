@@ -17,7 +17,9 @@ mongoose
     .catch((err) => console.log(err));
 
 const userRoutes = require("./routes/userroutes");
+const subgredditRoutes = require("./routes/subgreddiitroutes");
 
 app.use("/users", userRoutes);
+app.use("/subgreddiits", subgredditRoutes);
 
 app.listen(3001, () => console.log("Server is running on port 3001"));
