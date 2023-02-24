@@ -4,9 +4,9 @@ Content-Type: application/json
 {
 	"firstname": "John",
 	"lastname": "Doe",
-	"username": "harsha",
+	"username": "john6",
 	"password": "dummy50",
-	"email": "john10",
+	"email": "john6",
 	"dob": "1999-01-02",
 	"contactnumber": 9090909090
 }
@@ -37,8 +37,8 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:3001/users/get/63e7dcf1c43fa7ca54784368
-Authorization: token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2M2U3ZGNmMWM0M2ZhN2NhNTQ3ODQzNjgiLCJ1c2VybmFtZSI6ImhhcnNoYSIsImVtYWlsIjoicm9ja2luZ2hhcnNoYTcxQGdtYWlsLmNvbSIsImlhdCI6MTY3NjIxMTMxOCwiZXhwIjoxNjc4ODAzMzE4fQ.bRWfRcXmS0whWeuKFiw-q9vNqj978mp_9vIanBqeYos
+GET http://localhost:3001/users/get/63e9ab782659354279519644
+Authorization: token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2M2U5YWI3ODI2NTkzNTQyNzk1MTk2NDQiLCJ1c2VybmFtZSI6ImhhcnNoYSIsImVtYWlsIjoicm9ja2luZ2hhcnNoYTcxQGdtYWlsLmNvbSIsImlhdCI6MTY3NzA2MTEwNywiZXhwIjoxNjc5NjUzMTA3fQ.AfIoeWDPO5sXxC59HcoZRttZdy38PZ5K3ZNOhpZU9ic
 
 ###
 
@@ -80,6 +80,36 @@ Content-Type: application/json
 {
 	"type": "unsave",
 	"id": "63e9ab782659354279519644"
+}
+
+###
+
+PUT http://localhost:3001/users/follow/63f5eebaec9a3464ad54ed09
+Authorization: token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2M2Y1ZWViYWVjOWEzNDY0YWQ1NGVkMDkiLCJ1c2VybmFtZSI6ImpvaG4iLCJlbWFpbCI6ImpvaG4xMCIsImlhdCI6MTY3NzA2MjA5NSwiZXhwIjoxNjc5NjU0MDk1fQ.aJt32P4oULiZMSeFSwpRMJfKR64HLq83q7-QWOl2EzQ
+Content-Type: application/json
+
+{
+	"id": "63e9ab782659354279519644"
+}
+
+###
+
+PUT http://localhost:3001/users/removefollow/63e9ab782659354279519644
+Authorization: token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2M2U5YWI3ODI2NTkzNTQyNzk1MTk2NDQiLCJ1c2VybmFtZSI6ImhhcnNoYSIsImVtYWlsIjoicm9ja2luZ2hhcnNoYTcxQGdtYWlsLmNvbSIsImlhdCI6MTY3NzA2MzM2MiwiZXhwIjoxNjc5NjU1MzYyfQ.I6A3T7xk_umUta1rwLiInalkttFhOFnTUTDrEki7iLI
+Content-Type: application/json
+
+{
+	"id": "63f5eebaec9a3464ad54ed09"
+}
+
+###
+
+PUT http://localhost:3001/users/follow/63e9ab782659354279519644
+Authorization: token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2M2U5YWI3ODI2NTkzNTQyNzk1MTk2NDQiLCJ1c2VybmFtZSI6ImhhcnNoYSIsImVtYWlsIjoicm9ja2luZ2hhcnNoYTcxQGdtYWlsLmNvbSIsImlhdCI6MTY3NzEzNjgzMywiZXhwIjoxNjc5NzI4ODMzfQ.Z-BwWbSZsCpY0bYgM1u5tklrxnrzLeeRU9NqmYRbijA
+Content-Type: application/json
+
+{
+	"id": "63f5eed3ec9a3464ad54ed0f"
 }
 
 ###

@@ -44,6 +44,16 @@ const subgredditSchema = new Schema({
         default: [],
         required: true,
     },
+    posts: {
+        type: Array,
+        default: [],
+        required: true,
+    },
+    leftnormies: {
+        type: Array,
+        default: [],
+        required: true,
+    },
 });
 
 const Subgreddit = mongoose.model("Subgreddit", subgredditSchema);

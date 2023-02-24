@@ -71,7 +71,7 @@ const getReports = asyncHandler(async (req, res) => {
         }
     }
 
-    const reports = await Report.find({ subgreddiit: req.params.id });
+    const reports = await Report.find({ subgreddiit: req.body.id });
     if (reports) {
         res.status(200).send(reports);
     }
@@ -141,7 +141,7 @@ const updateReport = asyncHandler(async (req, res) => {
         }
     }
 
-    const report = await Report.findById(req.params.id);
+    const report = await Report.findById(req.body.id);
     if (report) {
         report.status = req.body.status;
         const updatedReport = await report.save();
@@ -178,7 +178,7 @@ const deleteReport = asyncHandler(async (req, res) => {
         }
     }
 
-    const report = await Report.findById(req.params.id);
+    const report = await Report.findById(req.body.id);
     if (report) {
         await report.remove();
         res.status(200).send({
@@ -217,9 +217,9 @@ const deleteAllReports = asyncHandler(async (req, res) => {
         }
     }
 
-    const reports = await Report.find({ subgreddiit: req.params.id });
+    const reports = await Report.find({ subgreddiit: req.body.id });
     if (reports) {
-        await Report.deleteMany({ subgreddiit: req.params.id });
+        await Report.deleteMany({ subgreddiit: req.body.id });
         res.status(200).send({
             deletion_status: "success",
         });

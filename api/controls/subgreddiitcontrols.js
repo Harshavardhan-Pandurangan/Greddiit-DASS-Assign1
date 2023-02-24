@@ -1,4 +1,6 @@
 const Subgreddit = require("../models/subgreddiits");
+const Post = require("../models/posts");
+const User = require("../models/users");
 const asyncHandler = require("express-async-handler");
 const jwt = require("jsonwebtoken");
 
@@ -83,17 +85,32 @@ const updateSubgreddiits = asyncHandler(async (req, res) => {
         const subgreddiit = await Subgreddit.findById(req.body.id);
         if (subgreddiit) {
             if (req.body.type == "normie") {
-                if (subgreddiit.normierequests.includes(req.body.normie)) {
-                    subgreddiit.normies.push(req.body.normie);
+                // Add a normie to the subgreddit, accept the request
+                if (req.params.id != subgreddiit.moderator) {
+                    res.status(403).send({
+                        error: "You are not the moderator of this subgreddit",
+                    });
+                    return;
+                }
+                let id = await User.findOne({ username: req.body.normie });
+                if (subgreddiit.normierequests.includes(id._id)) {
+                    subgreddiit.normies.push(id._id);
                     subgreddiit.normierequests =
                         subgreddiit.normierequests.filter(
-                            (normie) => normie != req.body.normie
+                            (normie) => normie != id._id
                         );
                 } else {
                     res.status(404).send({ message: "User has no request." });
                     return;
                 }
             } else if (req.body.type == "banned") {
+                // Ban a normie from the subgreddit, remove the normie
+                if (req.params.id != subgreddiit.moderator) {
+                    res.status(403).send({
+                        error: "You are not the moderator of this subgreddit",
+                    });
+                    return;
+                }
                 if (subgreddiit.normies.includes(req.body.bannednormie)) {
                     subgreddiit.bannednormies.push(req.body.bannednormie);
                     subgreddiit.normies = subgreddiit.normies.filter(
@@ -104,6 +121,7 @@ const updateSubgreddiits = asyncHandler(async (req, res) => {
                     return;
                 }
             } else if (req.body.type == "request") {
+                // Request to be a normie
                 if (
                     subgreddiit.normierequests.includes(
                         req.body.normierequest
@@ -111,7 +129,10 @@ const updateSubgreddiits = asyncHandler(async (req, res) => {
                     subgreddiit.normies.includes(req.body.normierequest) ||
                     subgreddiit.bannednormies.includes(req.body.normierequest)
                 ) {
-                    res.send({ message: "User already a normie or banned." });
+                    res.send({
+                        message:
+                            "User already has a request, is a normie or banned.",
+                    });
                     return;
                 } else {
                     subgreddiit.normierequests =
@@ -121,15 +142,24 @@ const updateSubgreddiits = asyncHandler(async (req, res) => {
                     subgreddiit.normierequests.push(req.body.normierequest);
                 }
             } else if (req.body.type == "removenormie") {
+                // Remove a normie from the subgreddit
                 if (subgreddiit.normies.includes(req.body.normie)) {
                     subgreddiit.normies = subgreddiit.normies.filter(
                         (normie) => normie != req.body.normie
                     );
+                    subgreddiit.leftnormies.push(req.body.normie);
                 } else {
                     res.status(404).send({ message: "User not a normie." });
                     return;
                 }
             } else if (req.body.type == "removebanned") {
+                // Remove a banned normie from the subgreddit
+                if (req.params.id != subgreddiit.moderator) {
+                    res.status(403).send({
+                        error: "You are not the moderator of this subgreddit",
+                    });
+                    return;
+                }
                 if (subgreddiit.bannednormies.includes(req.body.bannednormie)) {
                     subgreddiit.bannednormies =
                         subgreddiit.bannednormies.filter(
@@ -142,12 +172,18 @@ const updateSubgreddiits = asyncHandler(async (req, res) => {
                     return;
                 }
             } else if (req.body.type == "removerequest") {
-                if (
-                    subgreddiit.normierequests.includes(req.body.normierequest)
-                ) {
+                // Remove a normie request from the subgreddit
+                if (req.params.id != subgreddiit.moderator) {
+                    res.status(403).send({
+                        error: "You are not the moderator of this subgreddit",
+                    });
+                    return;
+                }
+                let id = await User.findOne({ username: req.body.normie });
+                if (subgreddiit.normierequests.includes(id._id)) {
                     subgreddiit.normierequests =
                         subgreddiit.normierequests.filter(
-                            (normie) => normie != req.body.normierequest
+                            (normie) => normie != id._id
                         );
                 } else {
                     res.status(404).send({
@@ -178,6 +214,7 @@ const getSubgreddiits = asyncHandler(async (req, res) => {
 
 const deleteAllSubgreddiits = asyncHandler(async (req, res) => {
     await Subgreddit.deleteMany({});
+    await Post.deleteMany({});
     res.send({ message: "All subgreddiits deleted" });
 });
 
@@ -198,7 +235,7 @@ const getSubgreddit = asyncHandler(async (req, res) => {
     if (authData) {
         if (req.params.id != authData._id) {
             res.status(403).send({
-                error: "You cannot view subgreddits for other users",
+                error: "You cannot view subgreddits of other moderators",
             });
             return;
         }
@@ -213,8 +250,11 @@ const getSubgreddit = asyncHandler(async (req, res) => {
 });
 
 const deleteSubgreddit = asyncHandler(async (req, res) => {
+    console.log(req.headers);
     let token = req.headers["authorization"];
     token = token.split(" ")[1];
+
+    console.log("trying");
 
     let authData;
     if (token) {
@@ -229,7 +269,7 @@ const deleteSubgreddit = asyncHandler(async (req, res) => {
     if (authData) {
         if (req.params.id != authData._id) {
             res.status(403).send({
-                error: "You cannot delete subgreddits for other users",
+                error: "You cannot delete subgreddits for other moderators",
             });
             return;
         }
@@ -237,7 +277,8 @@ const deleteSubgreddit = asyncHandler(async (req, res) => {
 
     const subgreddit = await Subgreddit.findById(req.body.id);
     if (subgreddit) {
-        await subgreddit.remove();
+        await Subgreddit.deleteOne({ _id: req.body.id });
+        await Post.deleteMany({ subgreddit: req.body.id });
         res.send({ message: "Subgreddit deleted" });
     } else {
         res.status(404).send({ message: "Subgreddit not found" });

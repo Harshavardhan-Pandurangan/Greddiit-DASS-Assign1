@@ -12,7 +12,7 @@ const {
 
 router.post("/create/:id", createPost);
 router.put("/update/:id", updatePost);
-router.get("/get/:id", getPosts);
+router.post("/get/:id", getPosts);
 router.delete("/delete/:id", deletePost);
 // to be commented out when deployed
 router.get("/getall", getAllPosts);

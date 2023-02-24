@@ -1,4 +1,6 @@
 const Post = require("../models/posts");
+const Subgreddit = require("../models/subgreddiits");
+const User = require("../models/users");
 const asyncHandler = require("express-async-handler");
 const jwt = require("jsonwebtoken");
 
@@ -26,13 +28,31 @@ const createPost = asyncHandler(async (req, res) => {
     }
 
     if (req.body) {
+        const subgreddiit = await Subgreddit.findById(req.body.subgreddiit);
+        if (!subgreddiit.moderator) {
+            res.status(404).send({ error: "Subgreddiit not found" });
+            return;
+        }
+        // console.log(subgreddiit);
+        // if (
+        //     !subgreddiit.normies.includes(req.params.id) ||
+        //     !subgreddiit.moderator == req.params.id
+        // ) {
+        //     res.status(403).send({
+        //         error: "You are not allowed to post in this subgreddiit",
+        //     });
+        //     return;
+        // }
+
         const post = new Post({
             title: req.body.title,
             text: req.body.text,
             postedby: req.params.id,
-            subgreddiit: req.body.subgreddiit,
+            subgreddit: req.body.subgreddiit,
         });
         const createdPost = await post.save();
+        subgreddiit.posts.push(createdPost._id);
+        await subgreddiit.save();
         res.send(createdPost);
     } else {
         res.status(400).send({ error: "Bad request" });
@@ -67,7 +87,25 @@ const getPosts = asyncHandler(async (req, res) => {
         res.send(posts);
     } else {
         const posts = await Post.find({ subgreddiit: req.body.subgreddiit });
-        res.send(posts);
+        let send_data = [];
+        posts.forEach((post) => {
+            send_data.push({
+                _id: post._id,
+                title: post.title,
+                text: post.text,
+                postedby: post.postedby,
+                subgreddit: post.subgreddit,
+                date: post.date,
+                upvotes: post.upvotes,
+                downvotes: post.downvotes,
+                comments: post.comments,
+            });
+        });
+        for (let i = 0; i < send_data.length; i++) {
+            const user = await User.findById(send_data[i].postedby);
+            send_data[i].postedby = user.username;
+        }
+        res.send(send_data);
     }
     res.status(400).send({ error: "Bad request" });
 });
@@ -79,6 +117,11 @@ const getAllPosts = asyncHandler(async (req, res) => {
 
 const deleteAllPosts = asyncHandler(async (req, res) => {
     const posts = await Post.deleteMany({});
+    const subgreddiits = await Subgreddit.find({});
+    subgreddiits.forEach((subgreddiit) => {
+        subgreddiit.posts = [];
+        subgreddiit.save();
+    });
     res.send(posts);
 });
 

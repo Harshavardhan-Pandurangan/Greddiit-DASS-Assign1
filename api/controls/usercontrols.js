@@ -250,6 +250,9 @@ const getUser = asyncHandler(async (req, res) => {
             email: user.email,
             dob: user.dob,
             contactnumber: user.contactnumber,
+            saved: user.saved,
+            followers: user.followers,
+            following: user.following,
         };
         res.status(200).send(userWithoutPassword);
     } else {
@@ -299,6 +302,190 @@ const savePostUser = asyncHandler(async (req, res) => {
     }
 });
 
+const followUser = asyncHandler(async (req, res) => {
+    let token = req.headers["authorization"];
+    token = token.split(" ")[1];
+
+    let authData;
+    try {
+        authData = await jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+        res.status(403).send({ error: "Invalid token" });
+        return;
+    }
+
+    if (req.params.id != authData._id) {
+        res.status(403).send({ error: "You cannot update other users" });
+        return;
+    }
+
+    const user = await User.findById(req.params.id);
+    const followuser = await User.findById(req.body.id);
+    const username = user.username;
+    const followusername = followuser.username;
+    console.log(username);
+    console.log(followusername);
+
+    let check = false;
+
+    if (user && followuser) {
+        let followers = followuser.followers;
+        let following = user.following;
+        for (let i = 0; i < followers.length; i++) {
+            if (followers[i].id == req.params.id) {
+                check = true;
+                break;
+            }
+        }
+        if (!check) {
+            followers.push({ id: req.params.id, name: username });
+        }
+        check = false;
+        for (let i = 0; i < following.length; i++) {
+            if (following[i].id == req.body.id) {
+                check = true;
+                break;
+            }
+        }
+        if (!check) {
+            following.push({ id: req.body.id, name: followusername });
+        }
+        followuser.followers = followers;
+        user.following = following;
+        await followuser.save();
+        await user.save();
+        res.status(200).send(user);
+        return;
+    } else {
+        res.status(404).send({ error: "One of the users id's do not exist." });
+        return;
+    }
+});
+
+const unfollowUser = asyncHandler(async (req, res) => {
+    let token = req.headers["authorization"];
+    token = token.split(" ")[1];
+
+    let authData;
+    try {
+        authData = await jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+        res.status(403).send({ error: "Invalid token" });
+        return;
+    }
+
+    if (req.params.id != authData._id) {
+        res.status(403).send({ error: "You cannot update other users" });
+        return;
+    }
+
+    const user = await User.findById(req.params.id);
+    const unfollowuser = await User.findById(req.body.id);
+    const username = user.username;
+    const unfollowusername = unfollowuser.username;
+
+    if (user && unfollowuser) {
+        let followers = unfollowuser.followers;
+        let following = user.following;
+        for (let i = 0; i < followers.length; i++) {
+            if (followers[i].id == req.params.id) {
+                followers = followers.filter((id) => id != followers[i]);
+            }
+        }
+        for (let i = 0; i < following.length; i++) {
+            if (following[i].id == req.body.id) {
+                following = following.filter((id) => id != following[i]);
+            }
+        }
+        unfollowuser.followers = followers;
+        user.following = following;
+        await unfollowuser.save();
+        await user.save();
+        res.status(200).send(user);
+        return;
+    } else {
+        res.status(404).send({ error: "One of the users id's do not exist." });
+        return;
+    }
+});
+
+const removeFollowUser = asyncHandler(async (req, res) => {
+    let token = req.headers["authorization"];
+    token = token.split(" ")[1];
+
+    let authData;
+    try {
+        authData = await jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+        res.status(403).send({ error: "Invalid token" });
+        return;
+    }
+
+    if (req.params.id != authData._id) {
+        res.status(403).send({ error: "You cannot update other users" });
+        return;
+    }
+
+    const user = await User.findById(req.params.id);
+    const removeuser = await User.findById(req.body.id);
+    const username = user.username;
+    const removeusername = removeuser.username;
+
+    if (user && removeuser) {
+        let followers = user.followers;
+        let following = removeuser.following;
+        for (let i = 0; i < followers.length; i++) {
+            if (followers[i].id == req.body.id) {
+                followers = followers.filter((id) => id != followers[i]);
+            }
+        }
+        for (let i = 0; i < following.length; i++) {
+            if (following[i].id == req.params.id) {
+                following = following.filter((id) => id != following[i]);
+            }
+        }
+        user.followers = followers;
+        removeuser.following = following;
+        await user.save();
+        await removeuser.save();
+        res.status(200).send(user);
+        return;
+    } else {
+        res.status(404).send({ error: "One of the users id's do not exist." });
+        return;
+    }
+});
+
+const getUsernames = asyncHandler(async (req, res) => {
+    let token = req.headers["authorization"];
+    token = token.split(" ")[1];
+
+    try {
+        authData = await jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+        res.status(403).send({ error: "Invalid token" });
+        return;
+    }
+
+    if (req.params.id != authData._id) {
+        res.status(403).send({ error: "You cannot update other users" });
+        return;
+    }
+
+    if (req.body) {
+        let usernames = [];
+        for (let i = 0; i < req.body.ids.length; i++) {
+            let user = await User.findById(req.body.ids[i]);
+            usernames.push(user.username);
+        }
+        res.status(200).send(usernames);
+        return;
+    } else {
+        res.status(404).send({ error: "No ids were provided." });
+        return;
+    }
+});
+
 module.exports = {
     createUser,
     loginUser,
@@ -309,4 +496,8 @@ module.exports = {
     getUser,
     deleteAllUsers,
     savePostUser,
+    followUser,
+    unfollowUser,
+    removeFollowUser,
+    getUsernames,
 };

@@ -37,6 +37,38 @@ const userSchema = new Schema({
         required: true,
         default: [],
     },
+    followers: {
+        type: [
+            {
+                id: {
+                    type: String,
+                    required: true,
+                },
+                name: {
+                    type: String,
+                    required: true,
+                },
+            },
+        ],
+        required: true,
+        default: [],
+    },
+    following: {
+        type: [
+            {
+                id: {
+                    type: String,
+                    required: true,
+                },
+                name: {
+                    type: String,
+                    required: true,
+                },
+            },
+        ],
+        required: true,
+        default: [],
+    },
 });
 
 const User = mongoose.model("User", userSchema);

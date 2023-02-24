@@ -14,7 +14,7 @@ const postSchema = new Schema({
         type: String,
         required: true,
     },
-    subgreddiit: {
+    subgreddit: {
         type: String,
         required: true,
     },

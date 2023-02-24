@@ -11,12 +11,12 @@ const {
     deleteAllReportsForce,
 } = require("../controls/reportcontrols");
 
-router.post("/create", createReport);
-router.get("/getreports", getReports);
+router.post("/create/:id", createReport);
+router.get("/getreports/:id", getReports);
 router.get("/getreport/:id", getReport);
 router.put("/update/:id", updateReport);
 router.delete("/delete/:id", deleteReport);
-router.delete("/deleteall", deleteAllReports);
+router.delete("/deleteall/:id", deleteAllReports);
 // to be commented out when deployed
 router.delete("/deleteallforce", deleteAllReportsForce);
 

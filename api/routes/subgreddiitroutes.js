@@ -12,8 +12,8 @@ const {
 
 router.post("/create/:id", createSubgreddit);
 router.put("/update/:id", updateSubgreddiits);
-router.get("/get/:id", getSubgreddit);
-router.delete("/delete/:id", deleteSubgreddit);
+router.post("/get/:id", getSubgreddit);
+router.post("/delete/:id", deleteSubgreddit);
 // to be commented out when deployed
 router.get("/getall", getSubgreddiits);
 router.delete("/deleteall", deleteAllSubgreddiits);

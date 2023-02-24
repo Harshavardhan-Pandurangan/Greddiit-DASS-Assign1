@@ -11,6 +11,10 @@ const {
     getUser,
     deleteAllUsers,
     savePostUser,
+    followUser,
+    unfollowUser,
+    removeFollowUser,
+    getUsernames,
 } = require("../controls/usercontrols");
 
 router.get("/verify", verifyUser);
@@ -19,6 +23,10 @@ router.put("/update/:id", updateUser);
 router.post("/login", loginUser);
 router.get("/get/:id", getUser);
 router.put("/save/:id", savePostUser);
+router.put("/follow/:id", followUser);
+router.put("/unfollow/:id", unfollowUser);
+router.put("/removefollow/:id", removeFollowUser);
+router.post("/getnames/:id", getUsernames);
 // to be commented out when deployed
 router.delete("/delete/:id", deleteUser);
 router.get("/getusers", getUsers);
