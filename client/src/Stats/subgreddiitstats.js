@@ -34,6 +34,11 @@ import GroupsIcon from "@mui/icons-material/Groups";
 import GroupIcon from "@mui/icons-material/Group";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
 import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark";
+import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+import GroupAddIcon from "@mui/icons-material/GroupAdd";
+import QueryStatsIcon from "@mui/icons-material/QueryStats";
+import ReportIcon from "@mui/icons-material/Report";
+import { useParams } from "react-router-dom";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -41,7 +46,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 const drawerWidth = 200;
 
-export default function Home(props) {
+export default function SubgreddiitStats(props) {
     let navigate = useNavigate();
 
     const { window } = props;
@@ -68,11 +73,72 @@ export default function Home(props) {
         setAnchorElDialog(false);
     };
 
+    let { subgreddiitId } = useParams();
+
     const [dialogType, setDialogType] = React.useState("logout");
 
     const drawer = (
         <div>
             <Toolbar />
+            <List>
+                <ListItem disablePadding>
+                    <ListItemButton
+                        onClick={() => {
+                            navigate(
+                                `/subgreddiits/myg/${localStorage.id}/${subgreddiitId}/users`
+                            );
+                        }}
+                    >
+                        <ListItemIcon>
+                            <PeopleAltIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Users" />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                    <ListItemButton
+                        onClick={() => {
+                            navigate(
+                                `/subgreddiits/myg/${localStorage.id}/${subgreddiitId}/requests`
+                            );
+                        }}
+                    >
+                        <ListItemIcon>
+                            <GroupAddIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Requests" />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                    <ListItemButton
+                        onClick={() => {
+                            navigate(
+                                `/subgreddiits/myg/${localStorage.id}/${subgreddiitId}/stats`
+                            );
+                        }}
+                    >
+                        <ListItemIcon>
+                            <QueryStatsIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Stats" />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                    <ListItemButton
+                        onClick={() => {
+                            navigate(
+                                `/subgreddiits/myg/${localStorage.id}/${subgreddiitId}/reports`
+                            );
+                        }}
+                    >
+                        <ListItemIcon>
+                            <ReportIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Reports" />
+                    </ListItemButton>
+                </ListItem>
+            </List>
+            <Divider />
             <List>
                 <ListItem disablePadding>
                     <ListItemButton
@@ -384,39 +450,7 @@ export default function Home(props) {
                 }}
             >
                 <Toolbar />
-                <Typography paragraph>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua. Rhoncus dolor purus non enim praesent elementum
-                    facilisis leo vel. Risus at ultrices mi tempus imperdiet.
-                    Semper risus in hendrerit gravida rutrum quisque non tellus.
-                    Convallis convallis tellus id interdum velit laoreet id
-                    donec ultrices. Odio morbi quis commodo odio aenean sed
-                    adipiscing. Amet nisl suscipit adipiscing bibendum est
-                    ultricies integer quis. Cursus euismod quis viverra nibh
-                    cras. Metus vulputate eu scelerisque felis imperdiet proin
-                    fermentum leo. Mauris commodo quis imperdiet massa
-                    tincidunt. Cras tincidunt lobortis feugiat vivamus at augue.
-                    At augue eget arcu dictum varius duis at consectetur lorem.
-                    Velit sed ullamcorper morbi tincidunt. Lorem donec massa
-                    sapien faucibus et molestie ac.
-                </Typography>
-                <Typography paragraph>
-                    Consequat mauris nunc congue nisi vitae suscipit. Fringilla
-                    est ullamcorper eget nulla facilisi etiam dignissim diam.
-                    Pulvinar elementum integer enim neque volutpat ac tincidunt.
-                    Ornare suspendisse sed nisi lacus sed viverra tellus. Purus
-                    sit amet volutpat consequat mauris. Elementum eu facilisis
-                    sed odio morbi. Euismod lacinia at quis risus sed vulputate
-                    odio. Morbi tincidunt ornare massa eget egestas purus
-                    viverra accumsan in. In hendrerit gravida rutrum quisque non
-                    tellus orci ac. Pellentesque nec nam aliquam sem et tortor.
-                    Habitant morbi tristique senectus et. Adipiscing elit duis
-                    tristique sollicitudin nibh sit. Ornare aenean euismod
-                    elementum nisi quis eleifend. Commodo viverra maecenas
-                    accumsan lacus vel facilisis. Nulla posuere sollicitudin
-                    aliquam ultrices sagittis orci a.
-                </Typography>
+                Stats
             </Box>
         </Box>
     );

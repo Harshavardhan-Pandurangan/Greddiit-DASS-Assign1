@@ -15,7 +15,7 @@ import ListItemText from "@mui/material/ListItemText";
 import { useEffect } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
-import { Grid } from "@mui/material";
+import { CardActions, Grid } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import Tooltip from "@mui/material/Tooltip";
 import Menu from "@mui/material/Menu";
@@ -34,6 +34,14 @@ import GroupsIcon from "@mui/icons-material/Groups";
 import GroupIcon from "@mui/icons-material/Group";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
 import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark";
+import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+import GroupAddIcon from "@mui/icons-material/GroupAdd";
+import QueryStatsIcon from "@mui/icons-material/QueryStats";
+import ReportIcon from "@mui/icons-material/Report";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -41,7 +49,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 const drawerWidth = 200;
 
-export default function Home(props) {
+export default function SubgreddiitRequests(props) {
     let navigate = useNavigate();
 
     const { window } = props;
@@ -68,11 +76,72 @@ export default function Home(props) {
         setAnchorElDialog(false);
     };
 
+    let { subgreddiitId } = useParams();
+
     const [dialogType, setDialogType] = React.useState("logout");
 
     const drawer = (
         <div>
             <Toolbar />
+            <List>
+                <ListItem disablePadding>
+                    <ListItemButton
+                        onClick={() => {
+                            navigate(
+                                `/subgreddiits/myg/${localStorage.id}/${subgreddiitId}/users`
+                            );
+                        }}
+                    >
+                        <ListItemIcon>
+                            <PeopleAltIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Users" />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                    <ListItemButton
+                        onClick={() => {
+                            navigate(
+                                `/subgreddiits/myg/${localStorage.id}/${subgreddiitId}/requests`
+                            );
+                        }}
+                    >
+                        <ListItemIcon>
+                            <GroupAddIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Requests" />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                    <ListItemButton
+                        onClick={() => {
+                            navigate(
+                                `/subgreddiits/myg/${localStorage.id}/${subgreddiitId}/stats`
+                            );
+                        }}
+                    >
+                        <ListItemIcon>
+                            <QueryStatsIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Stats" />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                    <ListItemButton
+                        onClick={() => {
+                            navigate(
+                                `/subgreddiits/myg/${localStorage.id}/${subgreddiitId}/reports`
+                            );
+                        }}
+                    >
+                        <ListItemIcon>
+                            <ReportIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Reports" />
+                    </ListItemButton>
+                </ListItem>
+            </List>
+            <Divider />
             <List>
                 <ListItem disablePadding>
                     <ListItemButton
@@ -155,11 +224,105 @@ export default function Home(props) {
     const container =
         window !== undefined ? () => window().document.body : undefined;
 
+    const [subgreddiit, setSubgreddiit] = React.useState({});
+    const [requests, setRequests] = React.useState([]);
+    const [requestNames, setRequestNames] = React.useState([]);
+
+    const [flag, setFlag] = React.useState(false);
+
     useEffect(() => {
-        if (localStorage.getItem("token") === null) {
-            navigate("/auth/signin");
+        if (!localStorage.token) {
+            alert("Please login to continue");
+        } else {
+            let url = `http://localhost:3001/subgreddiits/get/${localStorage.id}`;
+            let req_body = {
+                id: subgreddiitId,
+            };
+            let headers = {
+                headers: {
+                    Authorization: `token ${localStorage.token}`,
+                },
+            };
+            axios
+                .post(url, req_body, headers)
+                .then((res) => {
+                    setSubgreddiit(res.data);
+                    setRequests(res.data.normierequests);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
         }
-    }, []);
+    }, [flag]);
+
+    useEffect(() => {
+        let url = `http://localhost:3001/users/getnames/${localStorage.id}`;
+        let req_body = {
+            ids: requests,
+        };
+        let headers = {
+            headers: {
+                Authorization: `token ${localStorage.token}`,
+            },
+        };
+
+        axios
+            .post(url, req_body, headers)
+            .then((res) => {
+                setRequestNames(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }, [requests]);
+
+    const acceptRequest = (name) => {
+        let url = `http://localhost:3001/subgreddiits/update/${localStorage.id}`;
+        let req_body = {
+            id: subgreddiitId,
+            type: "normie",
+            normie: name,
+        };
+        let headers = {
+            headers: {
+                Authorization: `token ${localStorage.token}`,
+            },
+        };
+
+        axios
+            .put(url, req_body, headers)
+            .then((res) => {
+                console.log(res.data);
+                setFlag(!flag);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const rejectRequest = (name) => {
+        let url = `http://localhost:3001/subgreddiits/update/${localStorage.id}`;
+        let req_body = {
+            id: subgreddiitId,
+            type: "removerequest",
+            normie: name,
+        };
+        let headers = {
+            headers: {
+                Authorization: `token ${localStorage.token}`,
+            },
+        };
+
+        axios
+            .put(url, req_body, headers)
+            .then((res) => {
+                console.log(res.data);
+                setFlag(!flag);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
 
     return (
         <Box sx={{ display: "flex" }}>
@@ -384,39 +547,141 @@ export default function Home(props) {
                 }}
             >
                 <Toolbar />
-                <Typography paragraph>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua. Rhoncus dolor purus non enim praesent elementum
-                    facilisis leo vel. Risus at ultrices mi tempus imperdiet.
-                    Semper risus in hendrerit gravida rutrum quisque non tellus.
-                    Convallis convallis tellus id interdum velit laoreet id
-                    donec ultrices. Odio morbi quis commodo odio aenean sed
-                    adipiscing. Amet nisl suscipit adipiscing bibendum est
-                    ultricies integer quis. Cursus euismod quis viverra nibh
-                    cras. Metus vulputate eu scelerisque felis imperdiet proin
-                    fermentum leo. Mauris commodo quis imperdiet massa
-                    tincidunt. Cras tincidunt lobortis feugiat vivamus at augue.
-                    At augue eget arcu dictum varius duis at consectetur lorem.
-                    Velit sed ullamcorper morbi tincidunt. Lorem donec massa
-                    sapien faucibus et molestie ac.
-                </Typography>
-                <Typography paragraph>
-                    Consequat mauris nunc congue nisi vitae suscipit. Fringilla
-                    est ullamcorper eget nulla facilisi etiam dignissim diam.
-                    Pulvinar elementum integer enim neque volutpat ac tincidunt.
-                    Ornare suspendisse sed nisi lacus sed viverra tellus. Purus
-                    sit amet volutpat consequat mauris. Elementum eu facilisis
-                    sed odio morbi. Euismod lacinia at quis risus sed vulputate
-                    odio. Morbi tincidunt ornare massa eget egestas purus
-                    viverra accumsan in. In hendrerit gravida rutrum quisque non
-                    tellus orci ac. Pellentesque nec nam aliquam sem et tortor.
-                    Habitant morbi tristique senectus et. Adipiscing elit duis
-                    tristique sollicitudin nibh sit. Ornare aenean euismod
-                    elementum nisi quis eleifend. Commodo viverra maecenas
-                    accumsan lacus vel facilisis. Nulla posuere sollicitudin
-                    aliquam ultrices sagittis orci a.
-                </Typography>
+                <Grid
+                    container
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                >
+                    <Grid item>
+                        <Typography
+                            variant="h6"
+                            component="div"
+                            sx={{
+                                mb: 0,
+                                opacity: 0.6,
+                            }}
+                        >
+                            SubGreddiit
+                        </Typography>
+                    </Grid>
+                </Grid>
+                <Grid
+                    container
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                >
+                    <Grid item>
+                        <Typography
+                            variant="h4"
+                            component="div"
+                            sx={{ mb: 1.5 }}
+                        >
+                            {"g/" + subgreddiit.name}
+                        </Typography>
+                    </Grid>
+                </Grid>
+                <Divider sx={{ mb: 2 }} />
+                <Box sx={{ mt: 4 }}>
+                    <Grid item>
+                        <Typography
+                            variant="h6"
+                            component="div"
+                            sx={{ mb: 1.5 }}
+                        >
+                            Normie Requests
+                        </Typography>
+                    </Grid>
+                    <Grid container spacing={2}>
+                        {requestNames.map((rn) => {
+                            return (
+                                <Grid
+                                    item
+                                    xs={12}
+                                    sm={6}
+                                    md={4}
+                                    lg={3}
+                                    key={rn}
+                                >
+                                    <Card
+                                        sx={{
+                                            backgroundColor:
+                                                "rgba(255, 110, 30, 0.6)",
+                                        }}
+                                        key={rn}
+                                    >
+                                        <CardContent key={rn}>
+                                            <Typography
+                                                variant="body2"
+                                                color="text.secondary"
+                                                key={rn}
+                                                sx={{
+                                                    "&:hover": { opacity: 0.7 },
+                                                    cursor: "pointer",
+                                                    fontSize: "1.2rem",
+                                                    width: "100%",
+                                                    textAlign: "center",
+                                                }}
+                                            >
+                                                {"n/" + rn}
+                                            </Typography>
+                                        </CardContent>
+                                        <CardActions>
+                                            <Grid
+                                                container
+                                                direction="row"
+                                                justifyContent="space-between"
+                                                alignItems="center"
+                                            >
+                                                <Grid item>
+                                                    <Button
+                                                        variant="contained"
+                                                        sx={{
+                                                            backgroundColor:
+                                                                "white",
+                                                            color: "black",
+                                                            "&:hover": {
+                                                                backgroundColor:
+                                                                    "#f37220",
+                                                                color: "white",
+                                                            },
+                                                        }}
+                                                        onClick={() => {
+                                                            acceptRequest(rn);
+                                                        }}
+                                                    >
+                                                        Accept
+                                                    </Button>
+                                                </Grid>
+                                                <Grid item>
+                                                    <Button
+                                                        variant="contained"
+                                                        sx={{
+                                                            backgroundColor:
+                                                                "white",
+                                                            color: "black",
+                                                            "&:hover": {
+                                                                backgroundColor:
+                                                                    "#f37220",
+                                                                color: "white",
+                                                            },
+                                                        }}
+                                                        onClick={() => {
+                                                            rejectRequest(rn);
+                                                        }}
+                                                    >
+                                                        Reject
+                                                    </Button>
+                                                </Grid>
+                                            </Grid>
+                                        </CardActions>
+                                    </Card>
+                                </Grid>
+                            );
+                        })}
+                    </Grid>
+                </Box>
             </Box>
         </Box>
     );

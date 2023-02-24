@@ -18,19 +18,15 @@ export default function Auth() {
         .then((res) => {
             console.log(res.data.verify);
             if (res.data.verify == "valid") {
-                console.log("hmm");
                 localStorage.id = res.data._id;
-                console.log(localStorage.id);
-                navigate("/home", { replace: true });
+                navigate("/subgreddiits", { replace: true });
             } else {
-                console.log("hmm2");
                 localStorage.removeItem("token");
                 localStorage.removeItem("id");
                 navigate("/auth/signin", { replace: true });
             }
         })
         .catch((err) => {
-            console.log(err);
             localStorage.removeItem("token");
             localStorage.removeItem("id");
             navigate("/auth/signin", { replace: true });

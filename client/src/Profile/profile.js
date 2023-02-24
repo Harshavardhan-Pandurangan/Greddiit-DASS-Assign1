@@ -62,6 +62,8 @@ export default function Profile() {
     const [username, setUsername] = useState("");
     const [contact, setContact] = useState("");
     const [dob, setDob] = useState("");
+    const [followers, setFollowers] = useState([]);
+    const [following, setFollowing] = useState([]);
 
     const editProfile = () => {
         navigate("/edit-profile", { replace: true });
@@ -90,6 +92,8 @@ export default function Profile() {
                 setEmail(res.data.email);
                 setUsername(res.data.username);
                 setContact(res.data.contactnumber);
+                setFollowers(res.data.followers);
+                setFollowing(res.data.following);
                 let formattedDate = new Date(res.data.dob).toLocaleDateString(
                     "en-US",
                     {
@@ -111,6 +115,48 @@ export default function Profile() {
     const handleFollowingOpen = () => setOpenFollowing(true);
     const handleFollowingClose = () => setOpenFollowing(false);
 
+    const removefollowUser = (id) => {
+        let request_url =
+            "http://localhost:3001/users/removefollow/" + localStorage.id;
+        let json_pass_data = {
+            id: id,
+        };
+        let headers = {
+            headers: {
+                Authorization: `token ${localStorage.token}`,
+            },
+        };
+        axios
+            .put(request_url, json_pass_data, headers)
+            .then((res) => {
+                window.location.reload();
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const unfollowUser = (id) => {
+        let request_url =
+            "http://localhost:3001/users/unfollow/" + localStorage.id;
+        let json_pass_data = {
+            id: id,
+        };
+        let headers = {
+            headers: {
+                Authorization: `token ${localStorage.token}`,
+            },
+        };
+        axios
+            .put(request_url, json_pass_data, headers)
+            .then((res) => {
+                window.location.reload();
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     return (
         <ThemeProvider theme={theme}>
             <Container component="main" maxWidth="xs">
@@ -128,7 +174,9 @@ export default function Profile() {
                                 color: "white",
                                 backgroundColor: "rgb(243, 114, 32)",
                             }}
-                            onClick={() => navigate("/home", { replace: true })}
+                            onClick={() =>
+                                navigate("/subgreddiits", { replace: true })
+                            }
                         >
                             <HomeIcon />
                         </Button>
@@ -229,7 +277,7 @@ export default function Profile() {
                                     justifyContent: "center",
                                 }}
                             >
-                                {"u/" + username}
+                                {"n/" + username}
                             </Typography>
                         </Grid>
                     </Grid>
@@ -252,7 +300,7 @@ export default function Profile() {
                             }}
                         >
                             <Button onClick={handleFollowersOpen}>
-                                Followers
+                                Followers : {followers.length}
                             </Button>
                             <Modal
                                 open={openFollowers}
@@ -264,13 +312,53 @@ export default function Profile() {
                                     <Typography variant="h6" component="h2">
                                         Followers
                                     </Typography>
-                                    <Typography sx={{ mt: 2 }}>
-                                        <Typography>{"Person1"}</Typography>
-                                        <Typography>{"Person2"}</Typography>
-                                        <Typography>{"Person3"}</Typography>
-                                        <Typography>{"Person4"}</Typography>
-                                        <Typography>{"Person5"}</Typography>
-                                    </Typography>
+                                    {followers.map((follower) => {
+                                        return (
+                                            <Grid
+                                                container
+                                                spacing={2}
+                                                style={{
+                                                    display: "flex",
+                                                    justifyContent:
+                                                        "space-between",
+                                                }}
+                                            >
+                                                <Grid item xs={12} sm={4}>
+                                                    <Typography
+                                                        sx={{ mt: 2 }}
+                                                        key={follower._id}
+                                                    >
+                                                        <Typography>
+                                                            {"n/" +
+                                                                follower.name}
+                                                        </Typography>
+                                                    </Typography>
+                                                </Grid>
+                                                <Grid item xs={12} sm={4}>
+                                                    <Button
+                                                        variant="contained"
+                                                        style={{
+                                                            marginTop: "1rem",
+                                                            marginBottom:
+                                                                "1rem",
+                                                            borderRadius:
+                                                                "2rem",
+                                                            color: "white",
+                                                            backgroundColor:
+                                                                "rgb(243, 114, 32)",
+                                                        }}
+                                                        onClick={() => {
+                                                            removefollowUser(
+                                                                follower.id
+                                                            );
+                                                        }}
+                                                    >
+                                                        Remove
+                                                    </Button>
+                                                </Grid>
+                                            </Grid>
+                                        );
+                                    })}
                                 </Box>
                             </Modal>
                         </Grid>
@@ -284,7 +372,7 @@ export default function Profile() {
                             }}
                         >
                             <Button onClick={handleFollowingOpen}>
-                                Following
+                                Following : {following.length}
                             </Button>
                             <Modal
                                 open={openFollowing}
@@ -296,11 +384,52 @@ export default function Profile() {
                                     <Typography variant="h6" component="h2">
                                         Following
                                     </Typography>
-                                    <Typography sx={{ mt: 2 }}>
-                                        <Typography>{"Person1"}</Typography>
-                                        <Typography>{"Person2"}</Typography>
-                                        <Typography>{"Person3"}</Typography>
-                                    </Typography>
+                                    {following.map((follow) => {
+                                        return (
+                                            <Grid
+                                                container
+                                                spacing={2}
+                                                style={{
+                                                    display: "flex",
+                                                    justifyContent:
+                                                        "space-between",
+                                                }}
+                                            >
+                                                <Grid item xs={12} sm={4}>
+                                                    <Typography
+                                                        sx={{ mt: 2 }}
+                                                        key={follow._id}
+                                                    >
+                                                        <Typography>
+                                                            {"n/" + follow.name}
+                                                        </Typography>
+                                                    </Typography>
+                                                </Grid>
+                                                <Grid item xs={12} sm={4}>
+                                                    <Button
+                                                        variant="contained"
+                                                        style={{
+                                                            marginTop: "1rem",
+                                                            marginBottom:
+                                                                "1rem",
+                                                            borderRadius:
+                                                                "2rem",
+                                                            color: "white",
+                                                            backgroundColor:
+                                                                "rgb(243, 114, 32)",
+                                                        }}
+                                                        onClick={() => {
+                                                            unfollowUser(
+                                                                follow.id
+                                                            );
+                                                        }}
+                                                    >
+                                                        Unfollow
+                                                    </Button>
+                                                </Grid>
+                                            </Grid>
+                                        );
+                                    })}
                                 </Box>
                             </Modal>
                         </Grid>

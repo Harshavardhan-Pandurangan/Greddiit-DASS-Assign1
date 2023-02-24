@@ -34,6 +34,14 @@ import GroupsIcon from "@mui/icons-material/Groups";
 import GroupIcon from "@mui/icons-material/Group";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
 import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark";
+import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+import GroupAddIcon from "@mui/icons-material/GroupAdd";
+import QueryStatsIcon from "@mui/icons-material/QueryStats";
+import ReportIcon from "@mui/icons-material/Report";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -41,7 +49,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 const drawerWidth = 200;
 
-export default function Home(props) {
+export default function SubgreddiitUsers(props) {
     let navigate = useNavigate();
 
     const { window } = props;
@@ -68,11 +76,72 @@ export default function Home(props) {
         setAnchorElDialog(false);
     };
 
+    let { subgreddiitId } = useParams();
+
     const [dialogType, setDialogType] = React.useState("logout");
 
     const drawer = (
         <div>
             <Toolbar />
+            <List>
+                <ListItem disablePadding>
+                    <ListItemButton
+                        onClick={() => {
+                            navigate(
+                                `/subgreddiits/myg/${localStorage.id}/${subgreddiitId}/users`
+                            );
+                        }}
+                    >
+                        <ListItemIcon>
+                            <PeopleAltIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Users" />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                    <ListItemButton
+                        onClick={() => {
+                            navigate(
+                                `/subgreddiits/myg/${localStorage.id}/${subgreddiitId}/requests`
+                            );
+                        }}
+                    >
+                        <ListItemIcon>
+                            <GroupAddIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Requests" />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                    <ListItemButton
+                        onClick={() => {
+                            navigate(
+                                `/subgreddiits/myg/${localStorage.id}/${subgreddiitId}/stats`
+                            );
+                        }}
+                    >
+                        <ListItemIcon>
+                            <QueryStatsIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Stats" />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                    <ListItemButton
+                        onClick={() => {
+                            navigate(
+                                `/subgreddiits/myg/${localStorage.id}/${subgreddiitId}/reports`
+                            );
+                        }}
+                    >
+                        <ListItemIcon>
+                            <ReportIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Reports" />
+                    </ListItemButton>
+                </ListItem>
+            </List>
+            <Divider />
             <List>
                 <ListItem disablePadding>
                     <ListItemButton
@@ -155,11 +224,72 @@ export default function Home(props) {
     const container =
         window !== undefined ? () => window().document.body : undefined;
 
+    const [subgreddiit, setSubgreddiit] = React.useState({});
+    const [normies, setNormies] = React.useState([]);
+    const [banned, setBanned] = React.useState([]);
+
     useEffect(() => {
-        if (localStorage.getItem("token") === null) {
-            navigate("/auth/signin");
+        if (!localStorage.token) {
+            alert("Please login to continue");
+        } else {
+            let url = `http://localhost:3001/subgreddiits/get/${localStorage.id}`;
+            let req_body = {
+                id: subgreddiitId,
+            };
+            let headers = {
+                headers: {
+                    Authorization: `token ${localStorage.token}`,
+                },
+            };
+            axios
+                .post(url, req_body, headers)
+                .then((res) => {
+                    setSubgreddiit(res.data);
+                    setNormies(res.data.normies);
+                    setBanned(res.data.bannednormies);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
         }
     }, []);
+
+    const [names, setNames] = React.useState([]);
+    const [bannedNames, setBannedNames] = React.useState([]);
+
+    useEffect(() => {
+        let url = `http://localhost:3001/users/getnames/${localStorage.id}`;
+        let req_body = {
+            ids: normies,
+        };
+        let headers = {
+            headers: {
+                Authorization: `token ${localStorage.token}`,
+            },
+        };
+
+        axios
+            .post(url, req_body, headers)
+            .then((res) => {
+                setNames(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+
+        req_body = {
+            ids: banned,
+        };
+
+        axios
+            .post(url, req_body, headers)
+            .then((res) => {
+                setBannedNames(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }, [normies, banned]);
 
     return (
         <Box sx={{ display: "flex" }}>
@@ -384,39 +514,140 @@ export default function Home(props) {
                 }}
             >
                 <Toolbar />
-                <Typography paragraph>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua. Rhoncus dolor purus non enim praesent elementum
-                    facilisis leo vel. Risus at ultrices mi tempus imperdiet.
-                    Semper risus in hendrerit gravida rutrum quisque non tellus.
-                    Convallis convallis tellus id interdum velit laoreet id
-                    donec ultrices. Odio morbi quis commodo odio aenean sed
-                    adipiscing. Amet nisl suscipit adipiscing bibendum est
-                    ultricies integer quis. Cursus euismod quis viverra nibh
-                    cras. Metus vulputate eu scelerisque felis imperdiet proin
-                    fermentum leo. Mauris commodo quis imperdiet massa
-                    tincidunt. Cras tincidunt lobortis feugiat vivamus at augue.
-                    At augue eget arcu dictum varius duis at consectetur lorem.
-                    Velit sed ullamcorper morbi tincidunt. Lorem donec massa
-                    sapien faucibus et molestie ac.
-                </Typography>
-                <Typography paragraph>
-                    Consequat mauris nunc congue nisi vitae suscipit. Fringilla
-                    est ullamcorper eget nulla facilisi etiam dignissim diam.
-                    Pulvinar elementum integer enim neque volutpat ac tincidunt.
-                    Ornare suspendisse sed nisi lacus sed viverra tellus. Purus
-                    sit amet volutpat consequat mauris. Elementum eu facilisis
-                    sed odio morbi. Euismod lacinia at quis risus sed vulputate
-                    odio. Morbi tincidunt ornare massa eget egestas purus
-                    viverra accumsan in. In hendrerit gravida rutrum quisque non
-                    tellus orci ac. Pellentesque nec nam aliquam sem et tortor.
-                    Habitant morbi tristique senectus et. Adipiscing elit duis
-                    tristique sollicitudin nibh sit. Ornare aenean euismod
-                    elementum nisi quis eleifend. Commodo viverra maecenas
-                    accumsan lacus vel facilisis. Nulla posuere sollicitudin
-                    aliquam ultrices sagittis orci a.
-                </Typography>
+                <Grid
+                    container
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                >
+                    <Grid item>
+                        <Typography
+                            variant="h6"
+                            component="div"
+                            sx={{ mb: 0, opacity: 0.6 }}
+                        >
+                            SubGreddiit
+                        </Typography>
+                    </Grid>
+                </Grid>
+                <Grid
+                    container
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                >
+                    <Grid item>
+                        <Typography
+                            variant="h4"
+                            component="div"
+                            sx={{ mb: 1.5 }}
+                        >
+                            {"g/" + subgreddiit.name}
+                        </Typography>
+                    </Grid>
+                </Grid>
+                <Divider sx={{ mb: 2 }} />
+                <Box sx={{ mt: 4 }}>
+                    <Grid item>
+                        <Typography
+                            variant="h6"
+                            component="div"
+                            sx={{ mb: 1.5 }}
+                        >
+                            Normies
+                        </Typography>
+                    </Grid>
+                    <Grid container spacing={2}>
+                        {names.map((normie) => {
+                            return (
+                                <Grid
+                                    item
+                                    xs={12}
+                                    sm={6}
+                                    md={4}
+                                    lg={3}
+                                    key={normie}
+                                >
+                                    <Card
+                                        sx={{
+                                            backgroundColor:
+                                                "rgba(255, 110, 30, 0.6)",
+                                        }}
+                                        key={normie}
+                                    >
+                                        <CardContent key={normie}>
+                                            <Typography
+                                                variant="body2"
+                                                color="text.secondary"
+                                                key={normie}
+                                                sx={{
+                                                    "&:hover": { opacity: 0.7 },
+                                                    cursor: "pointer",
+                                                    fontSize: "1.2rem",
+                                                    width: "100%",
+                                                    textAlign: "center",
+                                                }}
+                                            >
+                                                {"n/" + normie}
+                                            </Typography>
+                                        </CardContent>
+                                    </Card>
+                                </Grid>
+                            );
+                        })}
+                    </Grid>
+                </Box>
+                <Divider sx={{ mb: 2, mt: 2 }} />
+                <Box sx={{ mt: 4 }}>
+                    <Grid item>
+                        <Typography
+                            variant="h6"
+                            component="div"
+                            sx={{ mb: 1.5 }}
+                        >
+                            Banned Normies
+                        </Typography>
+                    </Grid>
+                    <Grid container spacing={2}>
+                        {bannedNames.map((ban) => {
+                            return (
+                                <Grid
+                                    item
+                                    xs={12}
+                                    sm={6}
+                                    md={4}
+                                    lg={3}
+                                    key={ban}
+                                >
+                                    <Card
+                                        sx={{
+                                            backgroundColor:
+                                                "rgba(171, 85, 38, 0.6)",
+                                        }}
+                                        key={ban}
+                                    >
+                                        <CardContent key={ban}>
+                                            <Typography
+                                                variant="body2"
+                                                color="text.secondary"
+                                                key={ban}
+                                                sx={{
+                                                    "&:hover": { opacity: 0.7 },
+                                                    cursor: "pointer",
+                                                    fontSize: "1.2rem",
+                                                    width: "100%",
+                                                    textAlign: "center",
+                                                }}
+                                            >
+                                                {"n/" + ban}
+                                            </Typography>
+                                        </CardContent>
+                                    </Card>
+                                </Grid>
+                            );
+                        })}
+                    </Grid>
+                </Box>
             </Box>
         </Box>
     );

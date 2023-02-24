@@ -4,7 +4,17 @@ import SignUp from "./Auth/signup";
 import Profile from "./Profile/profile";
 import Edit from "./Profile/edit-profile";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Subgreddiits from "./Subgreddiits/subgreddiits";
+import MySubgreddiits from "./Subgreddiits/my_subgreddiits";
+import Subgreddiit from "./Subgreddiits/subgreddiit";
+import SubgreddiitUsers from "./Users/subgreddiitusers";
+import SubgreddiitRequests from "./Requests/subgreddiitrequests";
+import SubgreddiitStats from "./Stats/subgreddiitstats";
+import SubgreddiitReports from "./Reports/subgreddiitreports";
+import Users from "./Users/users";
+import Posts from "./Posts/posts";
 import Home from "./Home/home";
+import Reports from "./Reports/reports";
 
 function App() {
     return (
@@ -17,9 +27,36 @@ function App() {
                         <Route path="signin" element={<SignIn />} />
                         <Route path="signup" element={<SignUp />} />
                     </Route>
-                    <Route path="home" element={<Home />} />
                     <Route path="profile" element={<Profile />} />
                     <Route path="edit-profile" element={<Edit />} />
+                    <Route path="subgreddiits/">
+                        <Route index element={<Subgreddiits />} />
+                        <Route path="my/:id" element={<MySubgreddiits />} />
+                        <Route
+                            path=":subgreddiitId"
+                            element={<Subgreddiit />}
+                        />
+                        <Route path="myg/:id/:subgreddiitId/">
+                            <Route
+                                path="users"
+                                element={<SubgreddiitUsers />}
+                            />
+                            <Route
+                                path="requests"
+                                element={<SubgreddiitRequests />}
+                            />
+                            <Route
+                                path="stats"
+                                element={<SubgreddiitStats />}
+                            />
+                            <Route
+                                path="reports"
+                                element={<SubgreddiitReports />}
+                            />
+                        </Route>
+                    </Route>
+                    <Route path="home" element={<Home />} />
+                    <Route path="*" element={<Auth />} />
                 </Route>
             </Routes>
         </BrowserRouter>

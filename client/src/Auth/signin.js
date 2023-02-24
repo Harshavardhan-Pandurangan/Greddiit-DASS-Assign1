@@ -53,7 +53,7 @@ export default function SignIn() {
             .then((res) => {
                 localStorage.setItem("token", res.data.token);
                 localStorage.setItem("id", res.data._id);
-                navigate("/home", { replace: true });
+                navigate("/subgreddiits", { replace: true });
             })
             .catch((err) => {
                 alert("Invalid Credentials");
